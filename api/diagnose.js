@@ -1,5 +1,5 @@
 // تشخيص مشكلة في نبتة من صورة + وصف المستخدم، وخطة إنعاش.
-import { guard, readImage, claude, parseJSON, fail, RULES } from './_lib.js';
+import { guard, readImage, ai, parseJSON, fail, RULES } from './_lib.js';
 
 export const config = { maxDuration: 60 };
 
@@ -13,19 +13,13 @@ export default async function handler(req, res) {
     if (img.tooLarge) return res.status(413).json({ error: 'too_large' });
     const note = typeof req.body.note === 'string' ? req.body.note.trim().slice(0, 600) : '';
 
-    const text = await claude({
-      system: RULES,
-      maxTokens: 1500,
-      messages: [{ role: 'user', content: [
-        { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
-        { type: 'text', text: `المهمة: الصورة لنبتة يشتكي صاحبها من مشكلة فيها.${note ? ` قال المستخدم: «${note}»` : ''}
+    const task = `المهمة: الصورة لنبتة يشتكي صاحبها من مشكلة فيها.${note ? ` قال المستخدم: «${note}»` : ''}
 تعرّف على النبتة، وشخّص المشكلة الأرجح من العلامات الظاهرة فعلاً في الصورة (ومن كلام المستخدم)، ثم اكتب خطة إنعاش عملية مرتبة بحد أقصى 5 خطوات.
 فرّق بين الأسباب المتشابهة (سقي زائد أم عطش، آفة أم فطر أم حرق شمس) واذكر كيف يتأكد المستخدم بنفسه.
 إذا بدت النبتة سليمة فاجعل status=healthy. إذا لم تكن في الصورة نبتة فاجعل is_plant=false.
 أجب بكائن JSON واحد فقط بهذا الشكل:
-${SHAPE}` },
-      ] }],
-    });
+${SHAPE}`;
+    const text = await ai({ system: RULES, turns: [{ role: 'user', content: task }], image: img, json: true });
     res.status(200).json(parseJSON(text));
   } catch (e) { fail(res, e); }
 }

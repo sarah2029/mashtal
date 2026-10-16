@@ -1,5 +1,5 @@
-// التعرّف على نبتة: Pl@ntNet يقترح الأنواع، ثم Claude يتحقق منها بالصورة ويكتب دليل العناية.
-import { guard, readImage, plantnet, claude, parseJSON, fail, RULES } from './_lib.js';
+// التعرّف على نبتة: Pl@ntNet يقترح الأنواع، ثم Gemini يتحقق منها بالصورة ويكتب دليل العناية.
+import { guard, readImage, plantnet, ai, parseJSON, fail, RULES } from './_lib.js';
 
 export const config = { maxDuration: 60 };
 
@@ -22,19 +22,25 @@ export default async function handler(req, res) {
       hint = `\n\nملاحظة: نظام Pl@ntNet لم يتعرّف على نبتة في هذه الصورة. كن حذراً جداً، وإن لم تكن نبتة واضحة فاجعل is_plant=false.`;
     }
 
-    const text = await claude({
-      system: RULES,
-      maxTokens: 1500,
-      messages: [{ role: 'user', content: [
-        { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
-        { type: 'text', text: `المهمة: الصورة صوّرها مستخدم لنبتة يريد التعرف عليها. تعرّف على النبتة بدقة واكتب دليل العناية بها.
+    const task = `المهمة: الصورة صوّرها مستخدم لنبتة يريد التعرف عليها. تعرّف على النبتة بدقة واكتب دليل العناية بها.
 إذا لم تكن في الصورة نبتة واضحة فاجعل is_plant=false واترك باقي الحقول فارغة، واكتب في note ماذا يصوّر.${hint}
 أجب بكائن JSON واحد فقط بهذا الشكل بالضبط:
-${SHAPE}` },
-      ] }],
-    });
+${SHAPE}`;
+    let text;
+    try {
+      text = await ai({ system: RULES, turns: [{ role: 'user', content: task }], image: img, json: true });
+    } catch (e) {
+      // إذا انتهى الحد المجاني لـ Gemini ونجح Pl@ntNet: نرجع اسم النبتة على الأقل، والواجهة تكمل من الموسوعة
+      if (cands && cands.length) {
+        const c = cands[0];
+        return res.status(200).json({ is_plant: true, limited: true, confidence: c.score, scientific: c.scientific,
+          family: c.family, other_names: c.common, name_ar: c.common.split(',')[0] || c.scientific,
+          summary: 'تعرّفنا على النبتة، لكن دليل العناية المفصّل غير متاح الآن. حاول بعد قليل.', source: 'plantnet' });
+      }
+      throw e;
+    }
     const data = parseJSON(text);
-    data.source = cands && cands.length ? 'plantnet+claude' : 'claude';
+    data.source = cands && cands.length ? 'plantnet+gemini' : 'gemini';
     res.status(200).json(data);
   } catch (e) { fail(res, e); }
 }

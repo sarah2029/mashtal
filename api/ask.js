@@ -1,5 +1,5 @@
 // «اسأل مشتل»: محادثة قصيرة عن النباتات فقط.
-import { guard, claude, fail } from './_lib.js';
+import { guard, ai, fail } from './_lib.js';
 
 export const config = { maxDuration: 30 };
 
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       return acc;
     }, []);
     if (!turns.length || turns[turns.length - 1].role !== 'user') return res.status(400).json({ error: 'bad_request' });
-    const text = await claude({ system: ASK_RULES, messages: turns, maxTokens: 400 });
+    const text = await ai({ system: ASK_RULES, turns, maxTokens: 2048 });
     res.status(200).json({ text });
   } catch (e) { fail(res, e); }
 }

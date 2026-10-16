@@ -352,7 +352,7 @@ details.prob .body{padding-bottom:16px;display:flex;flex-direction:column;gap:12
     </div>
     <div class="card stack" style="gap:12px">
       <h2 style="font-size:17px">من أين تأتي المعلومات؟</h2>
-      <p>التعرّف على النباتات يتم بنظام Pl@ntNet العلمي ثم يتحقق منه الذكاء الاصطناعي (Claude)، والتشخيص يتم بالذكاء الاصطناعي ويُطلب منه الالتزام بالمراجع البستانية المعتمدة. معلومات الموسوعة مراجَعة من مصادر مثل الجمعية الملكية للبستنة (RHS)، والمكتبات الإرشادية للجامعات الزراعية، وقائمة النباتات السامة لجمعية ASPCA.</p>
+      <p>التعرّف على النباتات يتم بنظام Pl@ntNet العلمي ثم يتحقق منه الذكاء الاصطناعي (Gemini)، والتشخيص يتم بالذكاء الاصطناعي ويُطلب منه الالتزام بالمراجع البستانية المعتمدة. معلومات الموسوعة مراجَعة من مصادر مثل الجمعية الملكية للبستنة (RHS)، والمكتبات الإرشادية للجامعات الزراعية، وقائمة النباتات السامة لجمعية ASPCA.</p>
       <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg><p>المعلومات إرشادية. إذا ابتلع طفل أو حيوان أليف جزءاً من نبتة، اتصل بالطبيب أو البيطري فوراً.</p></div>
     </div>
     <div class="copy">
@@ -528,7 +528,8 @@ function errCopy(code){
     case 'too_large':return 'الصورة كبيرة جداً. جرّب صورة ثانية.';
     case 'rate_limited':return 'طلبات كثيرة خلال وقت قصير. انتظر قليلاً ثم حاول مرة ثانية.';
     case 'offline':return 'ما فيه اتصال بالإنترنت. الموسوعة وحديقتي تعمل بدون اتصال.';
-    case 'server_config':return 'الخدمة غير مهيّأة بعد. (لصاحبة التطبيق: أضيفي مفتاح ANTHROPIC_API_KEY في إعدادات Vercel).';
+    case 'server_config':return 'الخدمة غير مهيّأة بعد. (لصاحبة التطبيق: أضيفي مفتاح GEMINI_API_KEY في إعدادات Vercel).';
+    case 'refused':return 'تعذّر تحليل هذه الصورة. جرّب صورة ثانية للنبتة.';
     case 'invalid_json':return 'وصلت إجابة غير مكتملة. حاول مرة ثانية.';
     default:return 'صار خلل في الاتصال. حاول مرة ثانية.';
   }
@@ -556,7 +557,13 @@ async function runScan(file,mode){
     const thumb=await makeThumb(file);
     if(!data||typeof data!=='object')throw {code:'invalid_json'};
     if(data.is_plant===false)return renderNotPlant(box,url,str(data.note),mode);
-    if(mode==='diag')renderDiag(box,data,url,thumb); else renderCare(box,normalizeCare(data),{photo:url,thumb,scanned:true});
+    if(mode==='diag'){renderDiag(box,data,url,thumb);return;}
+    if(data.limited){ // الحد المجاني انتهى: نكمل من الموسوعة إن كانت النبتة فيها
+      const sci=str(data.scientific).toLowerCase();
+      const local=PLANTS.find(p=>sci&&(sci===p.sci.toLowerCase()||sci.startsWith(p.sci.toLowerCase())||p.sci.toLowerCase().startsWith(sci)));
+      if(local){renderCare(box,{...local,confidence:Math.max(0,Math.min(100,Math.round(Number(data.confidence)||0)))},{photo:url,thumb,scanned:true});return;}
+    }
+    renderCare(box,normalizeCare(data),{photo:url,thumb,scanned:true});
   }catch(e){
     scanCtl=null;
     if(e&&e.code==='cancelled'){show(lastTab);return;}
