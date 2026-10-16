@@ -38,9 +38,21 @@ export const lastError = { model: '', status: 0, message: '' };
 export const attempts = [];
 const dead = new Set(); // نماذج غير متاحة لهذا المفتاح، ما نعيد تجربتها
 
-async function callModel(key, m, body) {
-  const r = await fetch(`${GEM}/models/${m}:generateContent`, {
-    method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
+const busyUntil = new Map(); // نموذج مشغول (503/429) نتخطاه لدقيقتين
+const lastGood = {};          // آخر نموذج نجح لكل نوع طلب، نبدأ فيه
+const noThink = new Set();    // نماذج ما تقبل إعداد التفكير
+
+async function callModel(key, m, body, ms) {
+  const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), ms);
+  let r;
+  try {
+    r = await fetch(`${GEM}/models/${m}:generateContent`, { signal: ctl.signal,
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
+  } catch (e) {
+    Object.assign(lastError, { model: m, status: 408, message: 'timeout' });
+    attempts.push({ model: m, status: 408, message: 'timeout' });
+    return { ok: false, status: 408 };
+  } finally { clearTimeout(timer); }
   if (r.ok) return { ok: true, j: await r.json() };
   const t = await r.text().catch(() => '');
   let msg = t; try { msg = JSON.parse(t).error.message; } catch {}
@@ -52,7 +64,8 @@ async function callModel(key, m, body) {
 }
 
 // turns: [{role:'user'|'assistant', content: string}] ، image: {mediaType,data} اختيارية تُرفق بآخر رسالة
-export async function ai({ system, turns, image, json = false, maxTokens = 4096 }) {
+// fast=true للمحادثة: نبدأ بالنماذج الخفيفة لأنها أسرع
+export async function ai({ system, turns, image, json = false, maxTokens = 4096, fast = false, budgetMs = 50000 }) {
   const key = (process.env.GEMINI_API_KEY || '').trim();
   if (!key) throw { status: 500, code: 'server_config' };
   const contents = turns.map((t, i) => {
@@ -61,20 +74,33 @@ export async function ai({ system, turns, image, json = false, maxTokens = 4096 
     parts.push({ text: t.content });
     return { role: t.role === 'assistant' ? 'model' : 'user', parts };
   });
-  const base = { systemInstruction: { parts: [{ text: system }] }, contents,
-    generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2 } };
+  const gen = { maxOutputTokens: maxTokens, temperature: 0.2, ...(json ? { responseMimeType: 'application/json' } : {}) };
+  const plain = { systemInstruction: { parts: [{ text: system }] }, contents, generationConfig: gen };
+  const quick = { ...plain, generationConfig: { ...gen, thinkingConfig: { thinkingLevel: 'low' } } }; // تفكير أقل = أسرع
+
+  let order = fast ? [...MODELS.filter(m => /lite/.test(m)), ...MODELS.filter(m => !/lite/.test(m))] : [...MODELS];
+  const lg = lastGood[fast ? 'fast' : 'smart'];
+  if (lg && order.includes(lg)) order = [lg, ...order.filter(m => m !== lg)];
+  const now = Date.now();
+  order = [...order.filter(m => !(busyUntil.get(m) > now)), ...order.filter(m => busyUntil.get(m) > now)];
+
+  const start = Date.now();
   let limited = false, badKey = false;
-  for (const m of MODELS) {
+  for (const m of order) {
     if (dead.has(m)) continue;
-    let res = await callModel(key, m, json ? { ...base, generationConfig: { ...base.generationConfig, responseMimeType: 'application/json' } } : base);
-    if (!res.ok && res.status === 400 && json) res = await callModel(key, m, base); // بعض النماذج ما تقبل وضع JSON
+    const left = budgetMs - (Date.now() - start);
+    if (left < 4000) break;
+    const ms = Math.min(left, 30000);
+    let res = await callModel(key, m, noThink.has(m) ? plain : quick, ms);
+    if (!res.ok && res.status === 400 && !noThink.has(m)) { noThink.add(m); res = await callModel(key, m, plain, Math.min(budgetMs - (Date.now() - start), 30000)); }
+    if (!res.ok && res.status === 400 && json) res = await callModel(key, m, { ...plain, generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2 } }, Math.min(budgetMs - (Date.now() - start), 30000));
     if (res.ok) {
       const text = (res.j.candidates?.[0]?.content?.parts || []).filter(p => p.text && !p.thought).map(p => p.text).join('').trim();
-      if (text) return text;
+      if (text) { lastGood[fast ? 'fast' : 'smart'] = m; return text; }
       Object.assign(lastError, { model: m, status: 200, message: 'empty: ' + (res.j.candidates?.[0]?.finishReason || res.j.promptFeedback?.blockReason || '') });
       continue;
     }
-    if (res.status === 429 || res.status === 503) limited = true;
+    if (res.status === 429 || res.status === 503 || res.status === 408) { limited = true; busyUntil.set(m, Date.now() + 120000); }
     if (res.status === 401 || res.status === 403) { badKey = true; break; }
   }
   if (badKey) throw { status: 500, code: 'server_config' };

@@ -1,7 +1,7 @@
 // «اسأل مشتل»: محادثة قصيرة عن النباتات فقط.
 import { guard, ai, fail } from './_lib.js';
 
-export const config = { maxDuration: 30 };
+export const config = { maxDuration: 60 };
 
 const ASK_RULES = `أنت «مَشتل»، مساعد عربي متخصص في النباتات المنزلية والحدائق والعناية بها.
 - أجب فقط عن النباتات والزراعة والحدائق. إذا سُئلت عن غير ذلك فاعتذر بلطف وأعد الحديث للنباتات.
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       return acc;
     }, []);
     if (!turns.length || turns[turns.length - 1].role !== 'user') return res.status(400).json({ error: 'bad_request' });
-    const text = await ai({ system: ASK_RULES, turns, maxTokens: 2048 });
+    const text = await ai({ system: ASK_RULES, turns, maxTokens: 2048, fast: true, budgetMs: 50000 });
     res.status(200).json({ text });
   } catch (e) { fail(res, e); }
 }

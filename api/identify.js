@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 ${SHAPE}`;
     let text;
     try {
-      text = await ai({ system: RULES, turns: [{ role: 'user', content: task }], image: img, json: true });
+      text = await ai({ system: RULES, turns: [{ role: 'user', content: task }], image: img, json: true, budgetMs: 45000 });
     } catch (e) {
       // إذا انتهى الحد المجاني لـ Gemini ونجح Pl@ntNet: نرجع اسم النبتة على الأقل، والواجهة تكمل من الموسوعة
       if (cands && cands.length) {
