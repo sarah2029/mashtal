@@ -30,46 +30,49 @@ export function readImage(body) {
 
 /* ---------- Gemini (الخطة المجانية من Google AI Studio) ---------- */
 const GEM = 'https://generativelanguage.googleapis.com/v1beta';
-let pickedModel = process.env.GEMINI_MODEL || null;
+// نجرّب النماذج بالترتيب: إذا واحد انتهى حدّه المجاني أو غير متاح، ننتقل للي بعده (لكل نموذج حد مستقل)
+export const MODELS = [...new Set([process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'].filter(Boolean))];
+export const lastError = { model: '', status: 0, message: '' };
 
-// يختار تلقائياً أحدث نموذج Flash متاح لمفتاحك، حتى لا يتعطل التطبيق إذا غيّرت Google أسماء النماذج
-async function model(key) {
-  if (pickedModel) return pickedModel;
-  try {
-    const r = await fetch(`${GEM}/models?pageSize=200`, { headers: { 'x-goog-api-key': key } });
-    const j = await r.json();
-    const ok = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-      .map(m => m.name.replace(/^models\//, ''))
-      .filter(n => /flash/.test(n) && !/(image|tts|audio|live|embed|thinking|exp)/.test(n));
-    const rank = n => (/latest/.test(n) ? 1000 : 0) + parseFloat((n.match(/gemini-(\d+(?:\.\d+)?)/) || [0, 0])[1]) * 10 - (/lite/.test(n) ? 5 : 0) - (/preview/.test(n) ? 2 : 0);
-    ok.sort((x, y) => rank(y) - rank(x));
-    pickedModel = ok[0] || 'gemini-flash-latest';
-  } catch { pickedModel = 'gemini-flash-latest'; }
-  return pickedModel;
+async function callModel(key, m, body) {
+  const r = await fetch(`${GEM}/models/${m}:generateContent`, {
+    method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
+  if (r.ok) return { ok: true, j: await r.json() };
+  const t = await r.text().catch(() => '');
+  let msg = t; try { msg = JSON.parse(t).error.message; } catch {}
+  Object.assign(lastError, { model: m, status: r.status, message: String(msg).slice(0, 300) });
+  console.error('Gemini error', m, r.status, msg);
+  return { ok: false, status: r.status };
 }
 
 // turns: [{role:'user'|'assistant', content: string}] ، image: {mediaType,data} اختيارية تُرفق بآخر رسالة
 export async function ai({ system, turns, image, json = false, maxTokens = 4096 }) {
-  const key = process.env.GEMINI_API_KEY;
+  const key = (process.env.GEMINI_API_KEY || '').trim();
   if (!key) throw { status: 500, code: 'server_config' };
   const contents = turns.map((t, i) => {
     const parts = [];
-    if (image && i === turns.length - 1) parts.push({ inline_data: { mime_type: image.mediaType, data: image.data } });
+    if (image && i === turns.length - 1) parts.push({ inlineData: { mimeType: image.mediaType, data: image.data } });
     parts.push({ text: t.content });
     return { role: t.role === 'assistant' ? 'model' : 'user', parts };
   });
-  const body = { system_instruction: { parts: [{ text: system }] }, contents,
-    generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2, ...(json ? { responseMimeType: 'application/json' } : {}) } };
-  const m = await model(key);
-  const r = await fetch(`${GEM}/models/${m}:generateContent`, {
-    method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
-  if (r.status === 429 || r.status === 503) throw { status: 429, code: 'rate_limited' };
-  if (r.status === 404) { pickedModel = null; }
-  if (!r.ok) { console.error('Gemini error', m, r.status, await r.text().catch(() => '')); throw { status: 502, code: 'upstream' }; }
-  const j = await r.json();
-  const text = (j.candidates?.[0]?.content?.parts || []).filter(p => p.text && !p.thought).map(p => p.text).join('').trim();
-  if (!text) throw { status: 502, code: 'refused' };
-  return text;
+  const base = { systemInstruction: { parts: [{ text: system }] }, contents,
+    generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2 } };
+  let limited = false, badKey = false;
+  for (const m of MODELS) {
+    let res = await callModel(key, m, json ? { ...base, generationConfig: { ...base.generationConfig, responseMimeType: 'application/json' } } : base);
+    if (!res.ok && res.status === 400 && json) res = await callModel(key, m, base); // بعض النماذج ما تقبل وضع JSON
+    if (res.ok) {
+      const text = (res.j.candidates?.[0]?.content?.parts || []).filter(p => p.text && !p.thought).map(p => p.text).join('').trim();
+      if (text) return text;
+      Object.assign(lastError, { model: m, status: 200, message: 'empty: ' + (res.j.candidates?.[0]?.finishReason || res.j.promptFeedback?.blockReason || '') });
+      continue;
+    }
+    if (res.status === 429 || res.status === 503) limited = true;
+    if (res.status === 401 || res.status === 403) { badKey = true; break; }
+  }
+  if (badKey) throw { status: 500, code: 'server_config' };
+  if (limited) throw { status: 429, code: 'rate_limited' };
+  throw { status: 502, code: 'upstream' };
 }
 
 export function parseJSON(text) {

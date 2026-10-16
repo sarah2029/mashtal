@@ -1,5 +1,6 @@
 // التعرّف على نبتة: Pl@ntNet يقترح الأنواع، ثم Gemini يتحقق منها بالصورة ويكتب دليل العناية.
 import { guard, readImage, plantnet, ai, parseJSON, fail, RULES } from './_lib.js';
+import { arabicName, arabicFamily } from './_names.js';
 
 export const config = { maxDuration: 60 };
 
@@ -34,8 +35,8 @@ ${SHAPE}`;
       if (cands && cands.length) {
         const c = cands[0];
         return res.status(200).json({ is_plant: true, limited: true, confidence: c.score, scientific: c.scientific,
-          family: c.family, other_names: c.common, name_ar: c.common.split(',')[0] || c.scientific,
-          summary: 'تعرّفنا على النبتة، لكن دليل العناية المفصّل غير متاح الآن. حاول بعد قليل.', source: 'plantnet' });
+          family: arabicFamily(c.family), other_names: '', name_ar: arabicName(c.scientific),
+          summary: 'تعرّفنا على النبتة، لكن دليل العناية المفصّل مشغول الآن. حاول بعد دقيقة.', source: 'plantnet' });
       }
       throw e;
     }
