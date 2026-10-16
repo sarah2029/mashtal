@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E6B45">
+<meta name="description" content="مَشتل: صوّر نبتتك لتعرف اسمها وطريقة العناية بها، وشخّص مشكلتها.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<title>مَشتل</title>
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;700&display=swap">
+<style>
+/* Layout: one phone-width column, app shell — sticky header, stacked cards, fixed tab bar. Identity: water drop + leaf, Kufi wordmark, forest/chlorophyll greens with honey and clay. */
+:root{
+  --bg:#EEF3EA; --surface:#FFFFFF; --surface-2:#E3EBDD; --ink:#132219; --muted:#5A6B60; --line:#D3DDCC;
+  --accent:#1E6B45; --accent-ink:#FFFFFF; --accent-soft:#D7EBDD;
+  --leaf:#2F8A57; --leaf-2:#62AD72; --leaf-3:#1F6B41; --honey:#E2A53A; --clay:#C9673F; --clay-d:#A5502E;
+  --ok:#23804E; --ok-bg:#DDF0E3; --warn:#9A6A08; --warn-bg:#FBEFD2; --bad:#B23A26; --bad-bg:#FBE2DC;
+  --hero:#123A27; --hero-2:#1A4D33; --hero-ink:#EEF7F0; --hero-mute:#A8CFB6; --water:#7CC7E8;
+  --shadow:0 1px 2px rgba(19,34,25,.06),0 8px 24px rgba(19,34,25,.06);
+  --f-display:"Reem Kufi","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1510; --surface:#14211A; --surface-2:#1B2C22; --ink:#E5EFE7; --muted:#97AB9D; --line:#25382C;
+  --accent:#5DBE88; --accent-ink:#0C1510; --accent-soft:#183325;
+  --leaf:#4CAA72; --leaf-2:#7DC48F; --leaf-3:#2F8A57; --honey:#E8B65A; --clay:#D27A52; --clay-d:#B05E3B;
+  --ok:#68C892; --ok-bg:#163224; --warn:#E6B44E; --warn-bg:#33290F; --bad:#EE7A63; --bad-bg:#3A1C15;
+  --hero:#0F2A1D; --hero-2:#163A28; --hero-ink:#EEF7F0; --hero-mute:#9CC4AA; --water:#7CC7E8;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0C1510; --surface:#14211A; --surface-2:#1B2C22; --ink:#E5EFE7; --muted:#97AB9D; --line:#25382C;
+  --accent:#5DBE88; --accent-ink:#0C1510; --accent-soft:#183325;
+  --leaf:#4CAA72; --leaf-2:#7DC48F; --leaf-3:#2F8A57; --honey:#E8B65A; --clay:#D27A52; --clay-d:#B05E3B;
+  --ok:#68C892; --ok-bg:#163224; --warn:#E6B44E; --warn-bg:#33290F; --bad:#EE7A63; --bad-bg:#3A1C15;
+  --hero:#0F2A1D; --hero-2:#163A28; --hero-ink:#EEF7F0; --hero-mute:#9CC4AA; --water:#7CC7E8;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.shell{max-width:560px;margin:0 auto;padding-bottom:110px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.35}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--honey);outline-offset:2px;border-radius:10px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-block:12px;background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);background:none;border:0;padding:0;cursor:pointer}
+.brand svg{width:34px;height:34px;flex:none}
+.brand b{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1;color:var(--accent)}
+.iconbtn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex:none}
+.iconbtn svg{width:20px;height:20px}
+.back{display:flex;align-items:center;gap:6px;background:none;border:0;padding:6px 0;cursor:pointer;font-weight:600;font-size:16px}
+.back svg{width:22px;height:22px}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 85% 0%,var(--hero-2),var(--hero) 60%);color:var(--hero-ink);
+  border-radius:28px;padding:26px 22px 22px;display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center}
+.hero .word{font-family:var(--f-display);font-weight:700;font-size:clamp(52px,15vw,72px);line-height:1;letter-spacing:0}
+.hero .tag{grid-column:1/-1;color:var(--hero-mute);font-size:15px}
+.hero .drop{width:96px;height:110px;position:relative}
+.hero .drop svg{width:100%;height:100%;position:relative;z-index:1}
+.ripple{position:absolute;left:50%;bottom:4px;width:90px;height:22px;margin-left:-45px;border-radius:50%;border:2px solid var(--water);opacity:0;animation:rip 3.2s ease-out infinite}
+.ripple.r2{animation-delay:1.6s}
+@keyframes rip{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+
+/* sections */
+.stack{display:flex;flex-direction:column;gap:16px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:8px}
+.sec-h h2{font-size:19px;font-weight:700}
+.sec-h .link{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* action cards */
+.action{display:flex;flex-direction:column;gap:12px}
+.action .row{display:flex;align-items:center;gap:12px}
+.badge-ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;flex:none}
+.badge-ic svg{width:24px;height:24px}
+.action h3{font-size:18px}
+.action.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.action.primary .muted{color:inherit;opacity:.82}
+.action.primary .badge-ic{background:rgba(255,255,255,.16)}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 16px;border-radius:14px;border:1.5px solid var(--accent);
+  background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;text-decoration:none;flex:1 1 140px;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn.ghost{background:transparent;color:var(--accent)}
+.action.primary .btn{background:var(--accent-ink);color:var(--accent);border-color:var(--accent-ink)}
+.action.primary .btn.ghost{background:transparent;color:var(--accent-ink);border-color:rgba(255,255,255,.5)}
+textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg);resize:vertical}
+.notice{background:var(--warn-bg);color:var(--ink);border-radius:16px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.notice svg{width:20px;height:20px;flex:none;color:var(--warn);margin-top:3px}
+
+/* plant chips scroll */
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
+.pchip{scroll-snap-align:start;flex:0 0 132px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:10px;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:4px}
+.pchip .art{background:var(--surface-2);border-radius:14px;aspect-ratio:1;display:grid;place-items:center}
+.pchip .art svg{width:78%;height:78%}
+.pchip b{font-size:14px;line-height:1.4}
+.pchip i{font-size:11px;color:var(--muted);font-style:normal;direction:ltr;text-align:right}
+
+.tip{display:flex;gap:12px;align-items:flex-start;background:var(--surface-2);border-radius:20px;padding:16px}
+.tip .badge-ic{background:var(--surface);color:var(--honey)}
+
+/* result */
+.photo{position:relative;border-radius:26px;overflow:hidden;background:var(--surface-2);aspect-ratio:4/3;max-width:100%}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .art-big{width:100%;height:100%;display:grid;place-items:center}
+.photo .art-big svg{height:88%}
+.photo .pill{position:absolute;top:12px;right:12px}
+.scanline{position:absolute;inset-inline:8%;height:3px;border-radius:3px;background:var(--water);box-shadow:0 0 14px 2px var(--water);top:10%;animation:scan 2.2s ease-in-out infinite alternate}
+@keyframes scan{to{top:88%}}
+.scanning{display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+.dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin:0 3px;animation:dot 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600;background:var(--accent-soft);color:var(--accent)}
+.pill svg{width:15px;height:15px}
+.pill.solid{background:var(--accent);color:var(--accent-ink)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.title-block{display:flex;flex-direction:column;gap:2px}
+.title-block h1{font-family:var(--f-display);font-weight:700;font-size:30px}
+.sci{direction:ltr;text-align:right;color:var(--leaf);font-weight:600;font-style:italic;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile .badge-ic{width:38px;height:38px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
+.tile .badge-ic svg{width:20px;height:20px}
+.tile .lbl{font-size:12px;color:var(--muted);letter-spacing:.2px}
+.tile .val{font-weight:600;font-size:14.5px;line-height:1.6}
+.kv{display:flex;flex-direction:column}
+.kv > div{padding-block:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.kv > div:first-child{border-top:0;padding-top:0}
+.kv dt{font-size:13px;font-weight:600;color:var(--leaf)}
+.kv dd{margin:0}
+.callout{border-radius:20px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.callout svg{width:22px;height:22px;flex:none;margin-top:3px}
+.callout.bad{background:var(--bad-bg)}.callout.bad svg,.callout.bad b{color:var(--bad)}
+.callout.ok{background:var(--ok-bg)}.callout.ok svg,.callout.ok b{color:var(--ok)}
+.callout.warn{background:var(--warn-bg)}.callout.warn svg,.callout.warn b{color:var(--warn)}
+ul.clean{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+ul.clean li{display:flex;gap:10px;align-items:flex-start}
+ul.clean li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--honey);flex:none;margin-top:10px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;counter-reset:s}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;position:relative;padding-bottom:18px}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{counter-increment:s;content:counter(s,arabic-indic);width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700}
+.steps li:not(:last-child)::after{content:"";position:absolute;right:16px;top:38px;bottom:4px;width:2px;background:var(--line)}
+.steps b{display:block;font-size:15.5px}
+.steps span{color:var(--muted);font-size:14px}
+.conf{display:flex;align-items:center;gap:10px;font-size:13px}
+.conf .bar{flex:1;height:8px;border-radius:8px;background:var(--surface-2);overflow:hidden}
+.conf .bar i{display:block;height:100%;background:var(--accent);border-radius:8px}
+.source{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted)}
+.source svg{width:16px;height:16px;flex:none;margin-top:4px;color:var(--leaf)}
+
+/* library */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 14px;min-height:50px}
+.search input{border:0;background:none;flex:1;min-width:0;outline:none;font-size:15px}
+.search svg{width:20px;height:20px;color:var(--muted);flex:none}
+.plist{display:flex;flex-direction:column;gap:10px}
+.prow{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:10px;cursor:pointer;text-align:start;width:100%}
+.prow .art{width:64px;height:64px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;flex:none;overflow:hidden}
+.prow .art svg{width:80%;height:80%}
+.prow .art img{width:100%;height:100%;object-fit:cover}
+.prow .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.prow .txt b{font-size:16px}
+.prow .chev{width:20px;height:20px;color:var(--muted);flex:none}
+details.prob{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:0 16px}
+details.prob summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding-block:14px}
+details.prob summary::-webkit-details-marker{display:none}
+details.prob summary .badge-ic{width:38px;height:38px;border-radius:12px;background:var(--bad-bg);color:var(--clay)}
+details.prob summary .badge-ic svg{width:20px;height:20px}
+details.prob summary .t{flex:1;min-width:0}
+details.prob summary .t b{display:block}
+details.prob .plus{width:20px;height:20px;transition:transform .2s;color:var(--muted)}
+details.prob[open] .plus{transform:rotate(45deg)}
+details.prob .body{padding-bottom:16px;display:flex;flex-direction:column;gap:12px}
+
+/* garden */
+.gcard{display:flex;flex-direction:column;gap:12px}
+.gtop{display:flex;gap:12px;align-items:center}
+.gtop .art{width:58px;height:58px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;overflow:hidden;flex:none}
+.gtop .art img{width:100%;height:100%;object-fit:cover}.gtop .art svg{width:80%;height:80%}
+.gtop .txt{flex:1;min-width:0}
+.interval{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.interval button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700;line-height:1}
+.interval output{min-width:26px;text-align:center;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.gact{display:flex;gap:8px;align-items:center}
+.gact .btn{flex:1}
+.textbtn{background:none;border:0;color:var(--muted);cursor:pointer;padding:8px;font-size:13px}
+.textbtn.danger{color:var(--bad);font-weight:600}
+.empty{text-align:center;padding:30px 18px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty svg{width:120px;height:120px}
+
+/* ask */
+.chat{display:flex;flex-direction:column;gap:12px}
+.msg{max-width:88%;padding:12px 14px;border-radius:20px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.me{align-self:flex-start;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:6px}
+.msg.bot{align-self:flex-end;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.bot.thinking{color:var(--muted)}
+.suggest{display:flex;flex-wrap:wrap;gap:8px}
+.suggest button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13.5px}
+.composer{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding-block:10px}
+.composer textarea{min-height:48px;max-height:140px;background:var(--surface)}
+.composer .iconbtn{width:48px;height:48px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* tab bar */
+.tabs{position:fixed;inset:auto 0 0;z-index:6;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:end;height:72px}
+.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--muted);cursor:pointer;padding:8px 0 10px}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
+.tabs .cam{align-self:center}
+.tabs .cam span{width:58px;height:58px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;margin-top:-26px;box-shadow:0 6px 18px rgba(30,107,69,.35);border:4px solid var(--bg)}
+.tabs .cam span svg{width:26px;height:26px}
+
+.foot{text-align:center;padding:26px 8px 6px;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.foot b{color:var(--accent);font-weight:600}
+.about-hero{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 18px}
+.about-hero svg{width:84px;height:96px}
+.about-hero .word{font-family:var(--f-display);font-size:48px;font-weight:700;color:var(--accent);line-height:1}
+.copy{background:var(--hero);color:var(--hero-ink);border-radius:24px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.copy b{color:var(--honey);font-size:16px}
+.copy p{color:var(--hero-mute);font-size:13.5px}
+.sheet-pick{display:flex;flex-direction:column;gap:10px}
+
+@media (prefers-reduced-motion:reduce){.ripple,.scanline,.dots span{animation:none}.ripple{opacity:.4}.btn{transition:none}}
+@media (max-width:360px){.grid2{grid-template-columns:1fr}}
+</style>
+
+<div class="shell" dir="rtl" lang="ar">
+  <header class="top">
+    <button class="brand" id="brandBtn" aria-label="مَشتل — الرئيسية">
+      <svg viewBox="0 0 64 74" aria-hidden="true"><path d="M32 2C32 2 6 32 6 48a26 26 0 0 0 52 0C58 32 32 2 32 2Z" fill="var(--accent)"/><path d="M32 66c-1-12 2-22 10-32-11 3-18 12-19 22-4-6-4-12-1-18-6 4-8 12-5 19 3 6 9 9 15 9Z" fill="var(--bg)"/></svg>
+      <b>مَشتل</b>
+    </button>
+    <button class="back" id="backBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span>رجوع</span></button>
+    <button class="iconbtn" id="aboutBtn" aria-label="عن التطبيق وحقوق الملكية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></button>
+  </header>
+
+  <!-- HOME -->
+  <main id="v-home" class="stack" data-view>
+    <section class="hero" aria-label="مَشتل">
+      <div>
+        <div class="word">مَشتل</div>
+      </div>
+      <div class="drop" aria-hidden="true">
+        <span class="ripple"></span><span class="ripple r2"></span>
+        <svg viewBox="0 0 64 74"><defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD6A8"/><stop offset="1" stop-color="#3E9B66"/></linearGradient></defs><path d="M32 2C32 2 6 32 6 48a26 26 0 0 0 52 0C58 32 32 2 32 2Z" fill="url(#dg)"/><path d="M32 66c-1-12 2-22 10-32-11 3-18 12-19 22-4-6-4-12-1-18-6 4-8 12-5 19 3 6 9 9 15 9Z" fill="#123A27"/></svg>
+      </div>
+      <p class="tag">صوّر نبتتك، اعرف اسمها وطريقة العناية بها، وأنقذها إذا تعبت.</p>
+    </section>
+
+
+    <section class="card action primary" aria-labelledby="idH">
+      <div class="row">
+        <div class="badge-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
+        <div><h3 id="idH">تعرّف على نبتة</h3><p class="muted small">صورة واضحة للأوراق تكفي</p></div>
+      </div>
+      <div class="btns">
+        <label class="btn" for="idCam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>افتح الكاميرا</label>
+        <label class="btn ghost" for="idGal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>من الصور</label>
+      </div>
+      <input type="file" id="idCam" accept="image/*" capture="environment" hidden>
+      <input type="file" id="idGal" accept="image/*" hidden>
+    </section>
+
+    <section class="card action" aria-labelledby="dgH">
+      <div class="row">
+        <div class="badge-ic" style="background:var(--bad-bg);color:var(--clay)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></div>
+        <div><h3 id="dgH">نبتتي تعبانة</h3><p class="muted small">نشخّص المشكلة ونعطيك خطة إنعاش</p></div>
+      </div>
+      <label class="small muted" for="dgNote">وش لاحظت؟ (اختياري)</label>
+      <textarea id="dgNote" placeholder="مثلاً: الأوراق تصفر من تحت، وأسقيها كل يومين"></textarea>
+      <div class="btns">
+        <label class="btn" for="dgCam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>صوّر الجزء المصاب</label>
+        <label class="btn ghost" for="dgGal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>من الصور</label>
+      </div>
+      <input type="file" id="dgCam" accept="image/*" capture="environment" hidden>
+      <input type="file" id="dgGal" accept="image/*" hidden>
+    </section>
+
+    <div id="gardenSummary"></div>
+
+    <div class="tip">
+      <div class="badge-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></div>
+      <div><b>نصيحة اليوم</b><p id="tipText" class="muted"></p></div>
+    </div>
+
+    <div class="sec-h"><h2>نباتات منزلية شائعة</h2><button class="link" data-go="lib">الموسوعة</button></div>
+    <div class="hscroll" id="popular"></div>
+
+    <footer class="foot"><b>© 2026 سارة الهويمل</b><span>جميع الحقوق محفوظة</span></footer>
+  </main>
+
+  <!-- RESULT (scan / plant detail) -->
+  <main id="v-result" class="stack" data-view hidden></main>
+
+  <!-- LIBRARY -->
+  <main id="v-lib" class="stack" data-view hidden>
+    <div class="title-block"><h1 style="font-family:var(--f-display)">الموسوعة</h1><p class="muted">معلومات موثوقة تعمل حتى بدون اتصال</p></div>
+    <label class="search" for="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="q" type="search" placeholder="ابحث عن نبتة أو مشكلة…" autocomplete="off"></label>
+    <div class="sec-h"><h2>النباتات</h2></div>
+    <div class="plist" id="libPlants"></div>
+    <div class="sec-h"><h2>مشاكل شائعة وعلاجها</h2></div>
+    <div class="stack" id="libProbs" style="gap:10px"></div>
+    <p class="muted small" id="libEmpty" hidden>ما لقينا نتيجة. جرّب كلمة ثانية، أو صوّر النبتة من الرئيسية.</p>
+  </main>
+
+  <!-- ASK -->
+  <main id="v-ask" class="stack" data-view hidden>
+    <div class="title-block"><h1 style="font-family:var(--f-display)">اسأل مَشتل</h1><p class="muted">أي سؤال عن نباتاتك: سقي، تربة، ضوء، آفات</p></div>
+    <div class="suggest" id="suggest"></div>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <form class="composer" id="askForm">
+      <textarea id="askInput" rows="1" placeholder="اكتب سؤالك…" aria-label="سؤالك"></textarea>
+      <button class="iconbtn" id="askSend" aria-label="أرسل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    </form>
+  </main>
+
+  <!-- GARDEN -->
+  <main id="v-garden" class="stack" data-view hidden>
+    <div class="title-block"><h1 style="font-family:var(--f-display)">حديقتي</h1><p class="muted" id="gardenSub">نباتاتك ومواعيد سقيها</p></div>
+    <div class="stack" id="gardenList" style="gap:12px"></div>
+    <p class="muted small">تُحفظ حديقتك على هذا الجهاز.</p>
+  </main>
+
+  <!-- ABOUT -->
+  <main id="v-about" class="stack" data-view hidden>
+    <div class="about-hero">
+      <svg viewBox="0 0 64 74" aria-hidden="true"><path d="M32 2C32 2 6 32 6 48a26 26 0 0 0 52 0C58 32 32 2 32 2Z" fill="var(--accent)"/><path d="M32 66c-1-12 2-22 10-32-11 3-18 12-19 22-4-6-4-12-1-18-6 4-8 12-5 19 3 6 9 9 15 9Z" fill="var(--bg)"/></svg>
+      <div class="word">مَشتل</div>
+      <p class="muted">صوّر نبتتك لتعرف اسمها وطريقة العناية بها، وشخّص مشكلتها وأنقذها قبل أن تذبل.</p>
+      <span class="pill">الإصدار 1.0</span>
+    </div>
+    <div class="card stack" style="gap:12px">
+      <h2 style="font-size:17px">من أين تأتي المعلومات؟</h2>
+      <p>التعرّف على النباتات يتم بنظام Pl@ntNet العلمي ثم يتحقق منه الذكاء الاصطناعي (Claude)، والتشخيص يتم بالذكاء الاصطناعي ويُطلب منه الالتزام بالمراجع البستانية المعتمدة. معلومات الموسوعة مراجَعة من مصادر مثل الجمعية الملكية للبستنة (RHS)، والمكتبات الإرشادية للجامعات الزراعية، وقائمة النباتات السامة لجمعية ASPCA.</p>
+      <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg><p>المعلومات إرشادية. إذا ابتلع طفل أو حيوان أليف جزءاً من نبتة، اتصل بالطبيب أو البيطري فوراً.</p></div>
+    </div>
+    <div class="copy">
+      <b>© 2026 سارة الهويمل</b>
+      <span>جميع الحقوق محفوظة</span>
+      <p>فكرة وتصميم وتطوير: سارة أسامة الهويمل.<br>يُمنع نسخ أو إعادة استخدام أي جزء من التطبيق أو هويته أو تصميمه دون إذن كتابي من المالكة.</p>
+    </div>
+  </main>
+</div>
+
+<nav class="tabs" aria-label="التنقل">
+  <div class="in" dir="rtl">
+    <button data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>الرئيسية</button>
+    <button data-tab="lib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>الموسوعة</button>
+    <label class="cam" for="idCam" aria-label="صوّر نبتة"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span></label>
+    <button data-tab="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>اسأل</button>
+    <button data-tab="garden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>حديقتي</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+function el(tag,props,...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(props||{})){if(v==null||v===false)continue;if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?'':v);}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c instanceof Node?c:document.createTextNode(String(c)));}return e;}
+const str=v=>typeof v==='string'?v.trim():(v==null?'':String(v));
+const arr=v=>Array.isArray(v)?v.map(x=>typeof x==='object'&&x?x:str(x)).filter(Boolean):[];
+const IC={
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+ drop:'<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
+ thermo:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+ drops:'<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>',
+ alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>', shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+ plus:'<path d="M5 12h14M12 5v14"/>', chevL:'<path d="m15 18-6-6 6-6"/>', heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>',
+ bug:'<path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3 3 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6 13H2M22 13h-4"/>',
+ leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+ camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+ x:'<path d="M18 6 6 18M6 6l12 12"/>', pot:'<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+ retry:'<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>'
+};
+const ic=(n,cls)=>{const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('fill','none');s.setAttribute('stroke','currentColor');s.setAttribute('stroke-width','2');s.setAttribute('stroke-linecap','round');s.setAttribute('stroke-linejoin','round');if(cls)s.setAttribute('class',cls);s.innerHTML=IC[n]||'';return s;};
+const toAr=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+function days(n){n=Math.abs(n);if(n===1)return 'يوم';if(n===2)return 'يومين';if(n<=10)return toAr(n)+' أيام';return toAr(n)+' يوماً';}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return mem[k]??d;}},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const mem={};
+
+/* ---------- plant art (original illustrations) ---------- */
+function art(type){
+  const pot='<path d="M40 84h40l-5 28H45z" fill="var(--clay)"/><rect x="36" y="78" width="48" height="10" rx="3" fill="var(--clay-d)"/>';
+  const L=['var(--leaf)','var(--leaf-2)','var(--leaf-3)'];
+  let g='';
+  const leaf=(x,y,r,s,c)=>`<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})"><path d="M0 0C9 -13 33 -19 52 0C33 19 9 13 0 0Z" fill="${c}"/><path d="M4 0H46" stroke="var(--surface)" stroke-opacity=".35" stroke-width="1.5"/></g>`;
+  if(type==='upright'){[[-14,-6,L[2]],[-6,-2,L[0]],[2,2,L[1]],[10,6,L[0]],[16,10,L[2]]].forEach(([dx,rot,c],i)=>{const h=[50,64,70,60,46][i];g+=`<path transform="translate(${60+dx} 80) rotate(${rot})" d="M-5 0C-7 -${h*.5} -4 -${h*.85} 0 -${h}C4 -${h*.85} 7 -${h*.5} 5 0Z" fill="${c}"/>`;});}
+  else if(type==='rosette'){[-150,-125,-100,-80,-55,-30].forEach((r,i)=>{g+=`<g transform="translate(60 80) rotate(${r})"><path d="M0 -6C14 -5 40 -2 48 0C40 2 14 5 0 6Z" fill="${L[i%2?1:0]}"/></g>`;});}
+  else if(type==='trailing'){g+=leaf(60,80,-120,.8,L[0])+leaf(60,80,-60,.8,L[1])+leaf(60,80,-90,.9,L[2]);[[34,86],[30,98],[86,86],[90,100],[36,110]].forEach(([x,y],i)=>{g+=`<path d="M${x} ${y}c-6-8 -2-14 4-10c6-4 10 2 4 10l-4 5z" fill="${L[i%3]}"/>`;});g+='<path d="M40 82C32 90 30 100 34 112M80 82c8 6 10 14 10 20" stroke="var(--leaf-3)" stroke-width="1.6" fill="none"/>';}
+  else if(type==='bushy'){[[48,58],[60,50],[72,58],[42,70],[54,66],[66,66],[78,70],[60,36],[50,44],[70,44]].forEach(([x,y],i)=>{g+=`<ellipse cx="${x}" cy="${y}" rx="8" ry="11" transform="rotate(${(i*37)%60-30} ${x} ${y})" fill="${L[i%3]}"/>`;});}
+  else if(type==='tree'){g+='<path d="M59 80V40" stroke="var(--clay-d)" stroke-width="4"/>';[[60,26,0],[46,40,-30],[74,40,30],[48,56,-40],[72,56,40]].forEach(([x,y,r],i)=>{g+=`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 -16C12 -14 14 6 0 16C-14 6 -12 -14 0 -16Z" fill="${L[i%3]}"/>`;});}
+  else if(type==='spathe'){g+=leaf(60,80,-125,.95,L[0])+leaf(60,80,-55,.95,L[2])+leaf(60,80,-100,1.05,L[1])+leaf(60,80,-80,1.0,L[0]);g+='<path d="M60 80V36" stroke="var(--leaf-3)" stroke-width="2"/><path d="M60 22c-10 6-10 20 0 24c10-4 10-18 0-24z" fill="var(--surface)" stroke="var(--line)"/><rect x="58.5" y="30" width="3" height="12" rx="1.5" fill="var(--honey)"/>';}
+  else if(type==='zz'){[[-110,1.0],[-85,1.15],[-65,1.0]].forEach(([r,s])=>{g+=`<g transform="translate(60 80) rotate(${r}) scale(${s})"><path d="M0 0H56" stroke="var(--leaf-3)" stroke-width="2"/>`;for(let k=0;k<4;k++){const x=14+k*11;g+=`<ellipse cx="${x}" cy="-6" rx="6" ry="3.4" transform="rotate(-30 ${x} -6)" fill="var(--leaf)"/><ellipse cx="${x}" cy="6" rx="6" ry="3.4" transform="rotate(30 ${x} 6)" fill="var(--leaf-2)"/>`;}g+='</g>';});}
+  else {[[-150,.9],[-122,1.1],[-98,1.2],[-76,1.15],[-52,1.05],[-28,.88]].forEach(([r,s],i)=>{g+=leaf(60,80,r,s,L[i%3]);});}
+  return `<svg viewBox="0 0 120 120" aria-hidden="true">${g}${pot}</svg>`;
+}
+
+/* ---------- curated library (reviewed facts) ---------- */
+const PLANTS=[
+ {id:'pothos',name_ar:'البوتس الذهبي',other:'اللبلاب الذهبي، لبلاب الشيطان',sci:'Epipremnum aureum',family:'القلقاسية (Araceae)',origin:'جزيرة موريا في بولينيزيا الفرنسية',art:'trailing',difficulty:'سهلة جداً',interval:8,
+  summary:'متسلقة أو متدلية سريعة النمو، تتحمل الإهمال وتناسب المبتدئين.',
+  light:'ساطع غير مباشر، وتتحمل الضوء المنخفض لكن يبهت تبرقش أوراقها.',water:'عند جفاف أول 2–5 سم من التربة، تقريباً كل أسبوع إلى أسبوعين.',temp:'15–29°م، وتتضرر تحت 10°م.',humidity:'متوسطة، وتتحمل جو البيوت العادي.',
+  soil:'خليط تربة منزلية جيد التصريف مع بيرلايت.',fertilizer:'سماد سائل متوازن مخفف مرة شهرياً في الربيع والصيف.',propagation:'بالعُقل الساقية: عقلة فيها عقدة واحدة على الأقل تتجذّر في الماء خلال أسابيع.',
+  tox:{level:'toxic',text:'سامة للقطط والكلاب والأطفال إذا أُكلت: تحتوي بلورات أكسالات الكالسيوم التي تسبب تهيّج الفم والسيلان والقيء.'},
+  tips:['قصّ الأطراف الطويلة لتصبح النبتة كثيفة.','اصفرار عدة أوراق معاً غالباً علامة سقي زائد.']},
+ {id:'monstera',name_ar:'مونستيرا',other:'نبات الجبن السويسري',sci:'Monstera deliciosa',family:'القلقاسية (Araceae)',origin:'الغابات الاستوائية في جنوب المكسيك وأمريكا الوسطى',art:'broad',difficulty:'سهلة',interval:9,
+  summary:'أوراق كبيرة مشقوقة، تحتاج دعامة لتتسلق مع نموها.',
+  light:'ساطع غير مباشر. الشمس المباشرة القوية تحرق الأوراق، والضوء الضعيف يمنع ظهور الشقوق.',water:'عند جفاف أول 5 سم من التربة.',temp:'18–30°م، ولا تقل عن 12°م.',humidity:'متوسطة إلى عالية، ويُفضّل فوق 50٪.',
+  soil:'خليط خشن جيد التصريف: تربة مع بيرلايت ولحاء.',fertilizer:'سماد متوازن مخفف مرة شهرياً في موسم النمو.',propagation:'بعُقل ساقية تحتوي عقدة وجذراً هوائياً.',
+  tox:{level:'toxic',text:'سامة للقطط والكلاب: تحتوي بلورات أكسالات الكالسيوم.'},
+  tips:['امسح الأوراق الكبيرة بقماش رطب لإزالة الغبار.','ثبّت عمود طحلب أو خشب لتنمو للأعلى.']},
+ {id:'snake',name_ar:'لسان الحماة',other:'سانسيفيريا، نبات الثعبان',sci:'Dracaena trifasciata',family:'الهليونية (Asparagaceae)',origin:'غرب أفريقيا الاستوائية',art:'upright',difficulty:'سهلة جداً',interval:18,
+  summary:'أوراق قائمة صلبة، من أكثر النباتات تحمّلاً للإهمال وقلة الضوء.',
+  light:'من منخفض إلى ساطع، وتنمو أسرع في الضوء الساطع.',water:'قليل: عندما تجف التربة تماماً، كل 2–4 أسابيع، وأقل في الشتاء.',temp:'15–30°م، ولا تحب البرد تحت 10°م.',humidity:'منخفضة إلى متوسطة، وتتحمل الجو الجاف.',
+  soil:'تربة صبار وعصاريات سريعة التصريف.',fertilizer:'مرة أو مرتين فقط في موسم النمو، بسماد مخفف.',propagation:'بتقسيم الجذامير عند إعادة الزراعة، أو بعُقل الأوراق.',
+  tox:{level:'mild',text:'سامة بدرجة خفيفة للقطط والكلاب (صابونينات): قد تسبب غثياناً وقيئاً.'},
+  tips:['السقي الزائد هو سبب موتها الأول؛ إذا شككت، لا تسقِ.']},
+ {id:'zz',name_ar:'زاميا',other:'نبات ZZ',sci:'Zamioculcas zamiifolia',family:'القلقاسية (Araceae)',origin:'شرق أفريقيا',art:'zz',difficulty:'سهلة جداً',interval:16,
+  summary:'أوراق لامعة على سيقان ممتلئة، تخزن الماء في جذامير تحت التربة.',
+  light:'من منخفض إلى ساطع غير مباشر، وتتجنب الشمس المباشرة القوية.',water:'عندما تجف التربة كاملاً، كل 2–3 أسابيع تقريباً.',temp:'15–26°م.',humidity:'تتحمل الجو الجاف.',
+  soil:'تربة جيدة التصريف مع بيرلايت أو رمل خشن.',fertilizer:'مرة كل شهر إلى شهرين في الربيع والصيف.',propagation:'بتقسيم الجذامير أو بعُقل الوريقات (بطيئة).',
+  tox:{level:'toxic',text:'سامة للقطط والكلاب والإنسان إذا أُكلت: أكسالات الكالسيوم. اغسل يديك بعد قص سيقانها.'},
+  tips:['اصفرار السيقان وطراوتها علامة تعفن من السقي الزائد.']},
+ {id:'aloe',name_ar:'الصبر (الألوفيرا)',other:'الصبار الطبي',sci:'Aloe vera',family:'البروقية (Asphodelaceae)',origin:'شبه الجزيرة العربية',art:'rosette',difficulty:'سهلة',interval:18,
+  summary:'عصارية تخزن الماء في أوراق سميكة، تحب الشمس والجفاف.',
+  light:'ساطع، مع شمس مباشرة جزئية. في الضوء الضعيف تتمدد وتضعف.',water:'سقي عميق ثم انتظار جفاف التربة تماماً، تقريباً كل 2–3 أسابيع، وأقل في الشتاء.',temp:'13–27°م، ولا تتحمل الصقيع.',humidity:'منخفضة.',
+  soil:'تربة صبار وعصاريات، وأصيص فخار يساعد على الجفاف.',fertilizer:'نادراً: مرة أو مرتين في الصيف بسماد مخفف.',propagation:'بالخلفات الصغيرة التي تنمو حول قاعدتها.',
+  tox:{level:'toxic',text:'سامة للقطط والكلاب إذا أُكلت (صابونينات وأنثراكينونات): قيء وإسهال. الهلام الداخلي يستخدمه الناس على الجلد.'},
+  tips:['الأوراق الطرية الشفافة تعني ماء زائد، والمجعدة الرفيعة تعني عطش.']},
+ {id:'peace',name_ar:'زنبق السلام',other:'سباثيفيلوم',sci:'Spathiphyllum wallisii',family:'القلقاسية (Araceae)',origin:'الغابات الاستوائية في أمريكا الوسطى والجنوبية',art:'spathe',difficulty:'سهلة',interval:6,
+  summary:'تزهر بأغلفة بيضاء، وتنبهك بذبولها عندما تعطش.',
+  light:'منخفض إلى متوسط غير مباشر. الشمس المباشرة تحرق الأوراق.',water:'عند جفاف أول 2–3 سم. إذا ذبلت فجأة اسقها وستنتعش خلال ساعات.',temp:'18–27°م.',humidity:'عالية تفيدها؛ ضعها مع نباتات أخرى أو قرب صينية حصى وماء.',
+  soil:'تربة غنية جيدة التصريف تحتفظ ببعض الرطوبة.',fertilizer:'سماد مخفف كل 6–8 أسابيع في موسم النمو.',propagation:'بتقسيم النبتة عند إعادة الزراعة.',
+  tox:{level:'toxic',text:'سامة للقطط والكلاب: أكسالات الكالسيوم تسبب تهيّج الفم وصعوبة البلع.'},
+  tips:['أطراف الأوراق البنية غالباً من الجو الجاف أو أملاح ماء الصنبور.']},
+ {id:'mint',name_ar:'النعناع',other:'النعناع البلدي',sci:'Mentha spicata',family:'الشفوية (Lamiaceae)',origin:'أوروبا وجنوب غرب آسيا',art:'bushy',difficulty:'سهلة',interval:2,
+  summary:'عشبة عطرية سريعة الانتشار، تُزرع في أصيص لتبقى محصورة.',
+  light:'شمس مباشرة 4–6 ساعات يومياً، ونصف ظل في الصيف الحار.',water:'تحب التربة رطبة باستمرار دون تشبّع؛ اسقها عندما يبدأ السطح يجف.',temp:'15–30°م، وتحتاج ظلاً وماءً أكثر في حر الصيف.',humidity:'متوسطة.',
+  soil:'تربة غنية رطبة جيدة التصريف.',fertilizer:'سماد خفيف كل 4–6 أسابيع. التسميد الكثير يضعف رائحتها.',propagation:'بالعُقل في الماء أو بتقسيم الجذور، وتتجذّر بسرعة.',
+  tox:{level:'mild',text:'آمنة للإنسان كعشبة طعام، لكن ASPCA تصنفها سامة للقطط والكلاب بكميات كبيرة: قيء وإسهال.'},
+  tips:['قصّ الأطراف باستمرار وامنع الإزهار لتبقى الأوراق غزيرة وطيبة.']},
+ {id:'ficus',name_ar:'تين الكمان',other:'فيكس ليراتا',sci:'Ficus lyrata',family:'التوتية (Moraceae)',origin:'غرب أفريقيا الاستوائية',art:'tree',difficulty:'متوسطة',interval:8,
+  summary:'شجرة داخلية بأوراق كبيرة تشبه الكمان، تحب الثبات في مكانها.',
+  light:'ساطع جداً غير مباشر، ويفيدها قليل من شمس الصباح.',water:'عند جفاف أول 5 سم من التربة، بسقي عميق ثم تصريف كامل.',temp:'16–27°م، بعيداً عن التكييف والتيارات.',humidity:'متوسطة إلى عالية.',
+  soil:'تربة منزلية جيدة التصريف.',fertilizer:'سماد متوازن مرة شهرياً في الربيع والصيف.',propagation:'بالعُقل أو بالترقيد الهوائي.',
+  tox:{level:'toxic',text:'عصارتها اللبنية مهيّجة وسامة للقطط والكلاب: تهيّج الفم والجلد وقيء.'},
+  tips:['تسقط أوراقها إذا نقلتها كثيراً؛ اختر مكاناً واتركها فيه.']}
+];
+const PROBS=[
+ {id:'yellow',title:'اصفرار الأوراق',icon:'leaf',signs:'أوراق تصفر، غالباً من الأسفل، وقد تكون التربة رطبة.',causes:['السقي الزائد (السبب الأشهر)','قلة الضوء','نقص التغذية، خصوصاً النيتروجين','شيخوخة طبيعية لورقة أو ورقتين سفليتين'],fix:['افحص التربة بإصبعك قبل أي سقي.','تأكد أن للأصيص فتحة تصريف وأن الماء لا يتجمع في الصحن.','انقل النبتة لمكان أكثر إضاءة غير مباشرة.','أزل الأوراق الصفراء تماماً؛ لن تعود خضراء.']},
+ {id:'rot',title:'تعفّن الجذور',icon:'alert',signs:'ذبول رغم رطوبة التربة، ساق طرية عند القاعدة، رائحة كريهة من التربة.',causes:['سقي زائد مستمر','تربة ثقيلة لا تصرّف','أصيص بدون فتحة تصريف'],fix:['أوقف السقي وأخرج النبتة من الأصيص.','الجذور السليمة فاتحة وصلبة؛ قصّ البنية الطرية بمقص معقّم بالكحول.','ازرعها في تربة جديدة جيدة التصريف وأصيص بفتحة.','اسقها خفيفاً بعد أيام، وأجّل التسميد حتى يظهر نمو جديد.','إذا تعفنت كل الجذور، خذ عُقلاً سليمة وجذّرها من جديد.']},
+ {id:'brown',title:'أطراف بنية وجافة',icon:'drops',signs:'حواف أو أطراف الأوراق تصبح بنية ومقرمشة.',causes:['جو جاف أو قرب التكييف','سقي غير منتظم','تراكم أملاح من ماء الصنبور أو السماد'],fix:['انتظم في السقي حسب جفاف التربة.','ابعدها عن فتحات التكييف وارفع الرطوبة حولها.','اغسل التربة بماء وفير يمر من فتحة التصريف كل بضعة أشهر.','يمكنك قص الطرف البني بمقص نظيف مع ترك خط رفيع منه.']},
+ {id:'droop',title:'ذبول وتدلي',icon:'drop',signs:'الأوراق والسيقان متدلية وفاقدة للصلابة.',causes:['عطش: التربة جافة وخفيفة','أو العكس: سقي زائد أتلف الجذور','حرارة أو شمس مباشرة قوية'],fix:['المس التربة: إذا كانت جافة اسقها سقياً عميقاً.','إذا كانت مبللة، لا تسقِ، وافحص الجذور.','انقلها من الشمس الحارقة إلى ضوء غير مباشر.']},
+ {id:'mealy',title:'البق الدقيقي',icon:'bug',signs:'كتل بيضاء قطنية في زوايا الأوراق وعلى السيقان، ومادة لزجة.',causes:['حشرة ماصة تنتقل من نبتات مصابة'],fix:['اعزل النبتة عن باقي النباتات.','امسح كل حشرة بقطنة مبللة بكحول أيزوبروبيل 70٪.','رش صابوناً مبيداً للحشرات أو زيت النيم، وكرر أسبوعياً لعدة أسابيع.']},
+ {id:'mites',title:'العنكبوت الأحمر',icon:'bug',signs:'نقاط صفراء دقيقة على الأوراق، وخيوط عنكبوتية رفيعة تحتها.',causes:['الجو الحار والجاف يساعد على انتشاره'],fix:['اغسل الأوراق من الجهتين بماء فاتر.','ارفع الرطوبة حول النبتة.','عالج بصابون مبيد للحشرات أو زيت النيم وكرر كل 5–7 أيام.']},
+ {id:'mildew',title:'البياض الدقيقي',icon:'leaf',signs:'طبقة بيضاء كالبودرة على سطح الأوراق.',causes:['فطر ينتشر مع ضعف التهوية وتقلب الرطوبة'],fix:['أزل الأوراق المصابة بشدة.','حسّن التهوية وتجنب بلل الأوراق عند السقي.','استخدم مبيداً فطرياً مناسباً للنباتات المنزلية.']},
+ {id:'gnats',title:'ذباب الفطر',icon:'bug',signs:'ذباب أسود صغير يطير حول سطح التربة.',causes:['تربة رطبة باستمرار تتغذى فيها يرقاته'],fix:['اترك أول 3–5 سم من التربة تجف بين السقيات.','ضع مصائد صفراء لاصقة لصيد البالغات.','أزل الأوراق المتساقطة من سطح التربة.']}
+];
+const TIPS=['افحص التربة بإصبعك قبل السقي؛ أغلب نباتات البيت تموت من الماء الزائد لا من العطش.','الأصيص بدون فتحة تصريف يجمع الماء في القاع ويعفّن الجذور.','في الشتاء يبطؤ نمو أغلب النباتات، فقلّل السقي وأوقف التسميد.','امسح أوراق نبتتك بقماش رطب؛ الغبار يحجب الضوء عنها.','دوّر الأصيص ربع لفة كل أسبوع أو أسبوعين لتنمو النبتة متوازنة.','اسقِ سقياً عميقاً حتى يخرج الماء من الفتحة، ثم فرّغ الصحن.','ماء الصنبور العسر يترك أملاحاً؛ اغسل التربة بماء وفير كل بضعة أشهر.','إذا نقلت نبتة لمكان أشمس، انقلها تدريجياً حتى لا تحترق أوراقها.'];
+
+/* ---------- navigation ---------- */
+const TABS=['home','lib','ask','garden'];
+let current='home', lastTab='home';
+function show(v){
+  document.querySelectorAll('[data-view]').forEach(m=>m.hidden=m.id!=='v-'+v);
+  current=v; if(TABS.includes(v))lastTab=v;
+  const sub=!TABS.includes(v);
+  $('#brandBtn').hidden=sub; $('#backBtn').hidden=!sub;
+  const active=sub?lastTab:v;
+  document.querySelectorAll('.tabs button[data-tab]').forEach(b=>{if(b.dataset.tab===active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  if(v==='garden')renderGarden(); if(v==='home')renderSummary();
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.go)));
+$('#brandBtn').addEventListener('click',()=>show('home'));
+$('#aboutBtn').addEventListener('click',()=>show('about'));
+$('#backBtn').addEventListener('click',()=>{if(scanCtl){scanCtl.abort();}show(lastTab);});
+
+/* ---------- server calls ---------- */
+async function api(path,body,signal){
+  let r;
+  try{ r=await fetch('/api/'+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal}); }
+  catch(e){ if(e&&e.name==='AbortError')throw {code:'cancelled'}; throw {code:navigator.onLine===false?'offline':'network'}; }
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw {code:(j&&j.error)||'network'};
+  return j;
+}
+// يصغّر الصورة قبل الإرسال: أسرع وأرخص، ويحل مشكلة صور الآيفون الكبيرة
+async function prepImage(file){
+  try{
+    const bmp=await createImageBitmap(file);
+    const k=Math.min(1,1280/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    return c.toDataURL('image/jpeg',.85);
+  }catch(e){
+    return await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=()=>no({code:'image_rejected'});fr.readAsDataURL(file);});
+  }
+}
+
+function errCopy(code){
+  switch(code){
+    case 'image_rejected':return 'ما قدرنا نقرأ الصورة. جرّب صورة JPG أو PNG أوضح.';
+    case 'too_large':return 'الصورة كبيرة جداً. جرّب صورة ثانية.';
+    case 'rate_limited':return 'طلبات كثيرة خلال وقت قصير. انتظر قليلاً ثم حاول مرة ثانية.';
+    case 'offline':return 'ما فيه اتصال بالإنترنت. الموسوعة وحديقتي تعمل بدون اتصال.';
+    case 'server_config':return 'الخدمة غير مهيّأة بعد. (لصاحبة التطبيق: أضيفي مفتاح ANTHROPIC_API_KEY في إعدادات Vercel).';
+    case 'invalid_json':return 'وصلت إجابة غير مكتملة. حاول مرة ثانية.';
+    default:return 'صار خلل في الاتصال. حاول مرة ثانية.';
+  }
+}
+
+/* ---------- scanning flow ---------- */
+let scanCtl=null;
+async function makeThumb(file){try{const bmp=await createImageBitmap(file);const s=160/Math.max(bmp.width,bmp.height);const c=document.createElement('canvas');c.width=Math.round(bmp.width*Math.min(1,s));c.height=Math.round(bmp.height*Math.min(1,s));c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.72);}catch(e){return null;}}
+
+async function runScan(file,mode){
+  if(!file)return;
+  const box=$('#v-result'); box.replaceChildren(); show('result');
+  const url=URL.createObjectURL(file);
+  const photo=el('div',{class:'photo'},el('img',{src:url,alt:'صورة النبتة'}),el('div',{class:'scanline'}));
+  const status=el('p',{class:'muted',text:mode==='diag'?'نفحص الأوراق ونبحث عن سبب المشكلة…':'نتعرّف على النبتة ونجهّز دليل العناية…'});
+  const stop=el('button',{class:'btn ghost',type:'button'},ic('x'),'إلغاء');
+  box.append(photo,el('div',{class:'scanning'},el('div',{class:'dots'},el('span'),el('span'),el('span')),status,el('p',{class:'muted small',text:'قد يستغرق التحليل حتى دقيقة.'}),stop));
+  const ctl=new AbortController(); scanCtl=ctl; stop.onclick=()=>ctl.abort();
+  const note=mode==='diag'?str($('#dgNote').value):'';
+  try{
+    const image=await prepImage(file);
+    const data=await api(mode==='diag'?'diagnose':'identify',{image,note},ctl.signal);
+    if(scanCtl!==ctl)return;
+    scanCtl=null;
+    const thumb=await makeThumb(file);
+    if(!data||typeof data!=='object')throw {code:'invalid_json'};
+    if(data.is_plant===false)return renderNotPlant(box,url,str(data.note),mode);
+    if(mode==='diag')renderDiag(box,data,url,thumb); else renderCare(box,normalizeCare(data),{photo:url,thumb,scanned:true});
+  }catch(e){
+    scanCtl=null;
+    if(e&&e.code==='cancelled'){show(lastTab);return;}
+    renderFail(box,url,e&&e.code,file,mode);
+  }
+}
+function bindPick(id,mode){const i=document.getElementById(id);i.addEventListener('change',()=>{const f=i.files&&i.files[0];i.value='';runScan(f,mode);});}
+bindPick('idCam','id');bindPick('idGal','id');bindPick('dgCam','diag');bindPick('dgGal','diag');
+
+function retryBtns(mode){
+  const camId='rc'+Math.random().toString(36).slice(2),galId='rg'+camId;
+  const wrap=el('div',{class:'btns'},
+    el('label',{class:'btn',for:camId},ic('camera'),'صوّر مرة ثانية'),
+    el('label',{class:'btn ghost',for:galId},ic('retry'),'اختر صورة أخرى'),
+    el('input',{type:'file',id:camId,accept:'image/*',capture:'environment',hidden:true}),
+    el('input',{type:'file',id:galId,accept:'image/*',hidden:true}));
+  wrap.querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{const f=i.files&&i.files[0];i.value='';runScan(f,mode);}));
+  return wrap;
+}
+function renderFail(box,url,code,file,mode){
+  box.replaceChildren(el('div',{class:'photo'},el('img',{src:url,alt:'صورة النبتة'})),
+    el('div',{class:'callout warn'},ic('alert'),el('div',{},el('b',{text:'ما اكتمل التحليل'}),el('p',{text:errCopy(code)}))),
+    el('div',{class:'btns'},el('button',{class:'btn',type:'button',onclick:()=>runScan(file,mode)},ic('retry'),'حاول مرة ثانية'),el('button',{class:'btn ghost',type:'button',onclick:()=>show('lib')},'افتح الموسوعة')));
+}
+function renderNotPlant(box,url,note,mode){
+  box.replaceChildren(el('div',{class:'photo'},el('img',{src:url,alt:'الصورة'})),
+    el('div',{class:'callout warn'},ic('leaf'),el('div',{},el('b',{text:'ما لقينا نبتة واضحة في الصورة'}),el('p',{text:(note?note+' ':'')+'صوّر الأوراق عن قرب في ضوء النهار، وخلّ النبتة تملأ أغلب الصورة.'}))),
+    retryBtns(mode));
+}
+
+/* ---------- care renderer ---------- */
+function normalizeCare(d){
+  const t=d.toxicity||{};
+  return {name_ar:str(d.name_ar)||'نبتة غير معروفة',other:str(d.other_names),sci:str(d.scientific),family:str(d.family),origin:str(d.origin),summary:str(d.summary),difficulty:str(d.difficulty),
+   light:str(d.light),water:str(d.water),temp:str(d.temperature),humidity:str(d.humidity),soil:str(d.soil),fertilizer:str(d.fertilizer),propagation:str(d.propagation),
+   interval:Math.min(60,Math.max(1,Math.round(Number(d.water_interval_days)||7))),tox:{level:['none','mild','toxic'].includes(t.level)?t.level:'',text:str(t.text)},
+   tips:arr(d.tips).map(str),health:str(d.health_note),note:str(d.note),confidence:Math.max(0,Math.min(100,Math.round(Number(d.confidence)||0)))};
+}
+function tile(icon,lbl,val){return el('div',{class:'tile'},el('div',{class:'badge-ic'},ic(icon)),el('span',{class:'lbl',text:lbl}),el('span',{class:'val',text:val||'—'}));}
+function renderCare(box,c,opt){
+  opt=opt||{};
+  box.replaceChildren();
+  const head=el('div',{class:'photo'});
+  if(opt.photo)head.append(el('img',{src:opt.photo,alt:c.name_ar}));else head.append(el('div',{class:'art-big',html:art(c.art)}));
+  if(opt.scanned&&c.confidence){const p=el('span',{class:'pill solid'},ic('check'),'تطابق '+toAr(c.confidence)+'٪');head.append(p);}
+  box.append(head);
+  box.append(el('div',{class:'title-block'},el('h1',{text:c.name_ar}),c.sci?el('div',{class:'sci',text:c.sci}):null,c.other?el('p',{class:'muted small',text:'تُعرف أيضاً: '+c.other}):null));
+  const chips=el('div',{class:'chips'});
+  if(c.difficulty)chips.append(el('span',{class:'pill'},ic('pot'),c.difficulty));
+  if(c.family)chips.append(el('span',{class:'pill'},c.family));
+  if(chips.children.length)box.append(chips);
+  if(opt.scanned&&c.confidence&&c.confidence<65)box.append(el('div',{class:'callout warn'},ic('alert'),el('div',{},el('b',{text:'التعرّف غير مؤكد'}),el('p',{text:c.note||'صوّر الورقة والساق عن قرب، وإن وُجدت زهرة فصوّرها، ثم أعد المحاولة.'}))));
+  if(c.summary)box.append(el('p',{text:c.summary}));
+  if(c.health)box.append(el('div',{class:'callout warn'},ic('heart'),el('div',{},el('b',{text:'لاحظنا في الصورة'}),el('p',{text:c.health}))));
+  box.append(el('div',{class:'sec-h'},el('h2',{text:'دليل العناية'})));
+  box.append(el('div',{class:'grid2'},tile('sun','الضوء',c.light),tile('drop','السقي',c.water),tile('thermo','الحرارة',c.temp),tile('drops','الرطوبة',c.humidity)));
+  const kv=el('dl',{class:'kv card',style:'margin:0'});
+  [['التربة',c.soil],['التسميد',c.fertilizer],['الإكثار',c.propagation],['الموطن الأصلي',c.origin]].forEach(([k,v])=>{if(v)kv.append(el('div',{},el('dt',{text:k}),el('dd',{text:v})));});
+  if(kv.children.length)box.append(kv);
+  if(c.tox&&c.tox.text){const cls=c.tox.level==='none'?'ok':c.tox.level==='mild'?'warn':'bad';const t=c.tox.level==='none'?'آمنة غالباً':c.tox.level==='mild'?'سمية خفيفة':'تنبيه: سامة';
+    box.append(el('div',{class:'callout '+cls},ic(c.tox.level==='none'?'shield':'alert'),el('div',{},el('b',{text:t}),el('p',{text:c.tox.text}))));}
+  if(c.tips&&c.tips.length){box.append(el('div',{class:'sec-h'},el('h2',{text:'نصائح'})));box.append(el('ul',{class:'clean card'},c.tips.map(t=>el('li',{},el('span',{text:t})))));}
+  const inG=getGarden().some(g=>g.sci&&g.sci===c.sci&&!opt.scanned);
+  const addBtn=el('button',{class:'btn',type:'button'},ic('plus'),'أضف إلى حديقتي');
+  addBtn.onclick=()=>{addToGarden({name:c.name_ar,sci:c.sci,interval:c.interval||7,art:c.art||'broad',thumb:opt.thumb||null});addBtn.replaceChildren(ic('check'),'أُضيفت إلى حديقتي');addBtn.disabled=true;};
+  if(inG){addBtn.replaceChildren(ic('check'),'موجودة في حديقتك');addBtn.disabled=true;}
+  box.append(el('div',{class:'btns'},addBtn,el('label',{class:'btn ghost',for:'dgCam'},ic('heart'),'شخّص مشكلة فيها')));
+  if(opt.scanned)box.append(retryBtns('id'));
+  box.append(el('div',{class:'source'},ic('shield'),el('span',{text:opt.scanned?'التعرّف بنظام Pl@ntNet العلمي مع تحقق بالذكاء الاصطناعي، وقد يخطئ. قارن النتيجة بصفحة النبتة في الموسوعة إن وُجدت، وتأكد من السمية قبل وضعها قرب الأطفال والحيوانات.':'المصادر: الجمعية الملكية للبستنة (RHS)، الإرشاد الزراعي الجامعي، وقائمة ASPCA للنباتات السامة.'})));
+}
+
+/* ---------- diagnosis renderer ---------- */
+function renderDiag(box,d,url,thumb){
+  box.replaceChildren();
+  const st=['healthy','mild','moderate','severe'].includes(d.status)?d.status:'moderate';
+  const stTxt={healthy:'سليمة',mild:'بسيطة',moderate:'متوسطة',severe:'شديدة'}[st];
+  const stCls={healthy:'ok',mild:'ok',moderate:'warn',severe:'bad'}[st];
+  const conf=Math.max(0,Math.min(100,Math.round(Number(d.confidence)||0)));
+  box.append(el('div',{class:'photo'},el('img',{src:url,alt:'صورة النبتة'}),el('span',{class:'pill '+stCls},st==='healthy'?'تبدو سليمة':'الحالة: '+stTxt)));
+  const head=el('div',{class:'card stack',style:'gap:8px'},
+    el('span',{class:'muted small',text:'التشخيص الأرجح'}),
+    el('h1',{style:'font-family:var(--f-display);font-size:26px',text:str(d.diagnosis)||'غير محدد'}),
+    (str(d.plant_name_ar)||str(d.scientific))?el('p',{},el('span',{text:str(d.plant_name_ar)}),str(d.scientific)?el('span',{class:'sci',style:'display:inline;margin-inline-start:8px',text:str(d.scientific)}):null):null,
+    str(d.cause)?el('p',{class:'muted',text:str(d.cause)}):null,
+    conf?el('div',{class:'conf'},el('span',{text:'دقة التشخيص'}),el('div',{class:'bar'},el('i',{style:'width:'+conf+'%'})),el('b',{text:toAr(conf)+'٪'})):null);
+  box.append(head);
+  const sym=arr(d.symptoms).map(str);
+  if(sym.length){box.append(el('div',{class:'sec-h'},el('h2',{text:'العلامات في الصورة'})));box.append(el('ul',{class:'clean card'},sym.map(t=>el('li',{},el('span',{text:t})))));}
+  if(str(d.check))box.append(el('div',{class:'callout ok'},ic('check'),el('div',{},el('b',{text:'كيف تتأكد بنفسك'}),el('p',{text:str(d.check)}))));
+  const steps=arr(d.steps).filter(x=>typeof x==='object');
+  if(steps.length){box.append(el('div',{class:'sec-h'},el('h2',{text:st==='healthy'?'للمحافظة عليها':'خطة الإنعاش خطوة بخطوة'})));
+    box.append(el('ol',{class:'steps card'},steps.map(s=>el('li',{},el('div',{},el('b',{text:str(s.title)}),el('span',{text:str(s.detail)}))))));}
+  if(str(d.recovery))box.append(el('div',{class:'tip'},el('div',{class:'badge-ic'},ic('pot')),el('div',{},el('b',{text:'فرصة التعافي'}),el('p',{class:'muted',text:str(d.recovery)}))));
+  if(str(d.alternative))box.append(el('div',{class:'callout warn'},ic('leaf'),el('div',{},el('b',{text:'إذا كانت الحالة متقدمة'}),el('p',{text:str(d.alternative)}))));
+  const prev=arr(d.prevention).map(str);
+  if(prev.length){box.append(el('div',{class:'sec-h'},el('h2',{text:'حتى لا تتكرر'})));box.append(el('ul',{class:'clean card'},prev.map(t=>el('li',{},el('span',{text:t})))));}
+  const add=el('button',{class:'btn',type:'button'},ic('plus'),'أضفها لحديقتي للمتابعة');
+  add.onclick=()=>{addToGarden({name:str(d.plant_name_ar)||'نبتتي',sci:str(d.scientific),interval:7,art:'broad',thumb,note:str(d.diagnosis)});add.replaceChildren(ic('check'),'أُضيفت إلى حديقتي');add.disabled=true;};
+  box.append(el('div',{class:'btns'},add));
+  box.append(retryBtns('diag'));
+  box.append(el('div',{class:'source'},ic('shield'),el('span',{text:'التشخيص بالذكاء الاصطناعي من الصورة وقد يخطئ. ابدأ بالخطوات التي لا تضر، وإذا ساءت الحالة صوّرها مرة ثانية من قرب.'})));
+}
+
+/* ---------- library ---------- */
+function plantRow(p){return el('button',{class:'prow',type:'button',onclick:()=>openPlant(p)},el('div',{class:'art',html:art(p.art)}),el('div',{class:'txt'},el('b',{text:p.name_ar}),el('span',{class:'sci',style:'font-size:12.5px',text:p.sci}),el('span',{class:'muted small',text:p.difficulty+' · السقي تقريباً كل '+days(p.interval)})),ic('chevL','chev'));}
+function openPlant(p){renderCare($('#v-result'),{name_ar:p.name_ar,other:p.other,sci:p.sci,family:p.family,origin:p.origin,summary:p.summary,difficulty:p.difficulty,light:p.light,water:p.water,temp:p.temp,humidity:p.humidity,soil:p.soil,fertilizer:p.fertilizer,propagation:p.propagation,tox:p.tox,tips:p.tips,interval:p.interval,art:p.art},{});show('result');}
+function probCard(p){return el('details',{class:'prob'},el('summary',{},el('div',{class:'badge-ic'},ic(p.icon)),el('div',{class:'t'},el('b',{text:p.title}),el('span',{class:'muted small',text:p.signs})),ic('plus','plus')),
+  el('div',{class:'body'},el('div',{},el('b',{class:'small',style:'color:var(--leaf)',text:'الأسباب المحتملة'}),el('ul',{class:'clean',style:'margin-top:6px'},p.causes.map(c=>el('li',{},el('span',{text:c}))))),
+   el('div',{},el('b',{class:'small',style:'color:var(--leaf)',text:'العلاج'}),el('ol',{class:'steps',style:'margin-top:10px'},p.fix.map(f=>el('li',{},el('div',{},el('span',{style:'color:var(--ink)',text:f}))))))));}
+function renderLib(q){
+  q=(q||'').trim().toLowerCase();
+  const m=t=>!q||t.toLowerCase().includes(q);
+  const ps=PLANTS.filter(p=>m(p.name_ar+' '+p.other+' '+p.sci));
+  const pr=PROBS.filter(p=>m(p.title+' '+p.signs+' '+p.causes.join(' ')));
+  $('#libPlants').replaceChildren(...ps.map(plantRow));
+  $('#libProbs').replaceChildren(...pr.map(probCard));
+  $('#libEmpty').hidden=!!(ps.length||pr.length);
+}
+$('#q').addEventListener('input',e=>renderLib(e.target.value));
+
+/* ---------- garden ---------- */
+const GK='suqya.garden.v1';
+const DAY=86400000;
+function getGarden(){const g=store.get(GK,[]);return Array.isArray(g)?g:[];}
+function saveGarden(g){store.set(GK,g);}
+function addToGarden(p){const g=getGarden();g.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:p.name,sci:p.sci||'',interval:p.interval||7,art:p.art||'broad',thumb:p.thumb||null,note:p.note||'',last:Date.now(),added:Date.now()});saveGarden(g);}
+function dueInfo(p){const next=p.last+p.interval*DAY;const d=Math.ceil((next-Date.now())/DAY);if(d<0)return{cls:'bad',text:'متأخر '+days(d)};if(d===0)return{cls:'warn',text:'وقت السقي اليوم'};return{cls:'ok',text:'السقي بعد '+days(d)};}
+function renderGarden(){
+  const g=getGarden(), list=$('#gardenList');
+  const due=g.filter(p=>Math.ceil((p.last+p.interval*DAY-Date.now())/DAY)<=0).length;
+  $('#gardenSub').textContent=g.length?(toAr(g.length)+' '+(g.length===1?'نبتة':g.length===2?'نبتتان':g.length<=10?'نباتات':'نبتة')+(due?' · '+toAr(due)+' تحتاج سقي':' · كلها مرتوية')):'نباتاتك ومواعيد سقيها';
+  if(!g.length){list.replaceChildren(el('div',{class:'card empty'},el('div',{html:art('trailing')}),el('b',{text:'حديقتك فاضية'}),el('p',{class:'muted small',text:'صوّر نبتة أو افتح أي نبتة من الموسوعة واضغط «أضف إلى حديقتي»، ومَشتل يحسب لك موعد السقي.'}),el('div',{class:'btns',style:'width:100%'},el('label',{class:'btn',for:'idCam'},ic('camera'),'صوّر نبتة'),el('button',{class:'btn ghost',type:'button',onclick:()=>show('lib')},'الموسوعة'))));return;}
+  g.sort((a,b)=>(a.last+a.interval*DAY)-(b.last+b.interval*DAY));
+  list.replaceChildren(...g.map(p=>{
+    const info=dueInfo(p);
+    const out=el('output',{text:toAr(p.interval)});
+    const setI=dv=>{const all=getGarden();const it=all.find(x=>x.id===p.id);if(!it)return;it.interval=Math.max(1,Math.min(60,it.interval+dv));saveGarden(all);renderGarden();};
+    const confirmRow=el('div',{class:'gact',hidden:true},el('span',{class:'small muted',style:'flex:1',text:'تحذف '+p.name+' من حديقتك؟'}),el('button',{class:'textbtn danger',type:'button',onclick:()=>{saveGarden(getGarden().filter(x=>x.id!==p.id));renderGarden();}},'احذف'),el('button',{class:'textbtn',type:'button',onclick:()=>{confirmRow.hidden=true;actRow.hidden=false;}},'تراجع'));
+    const actRow=el('div',{class:'gact'},el('button',{class:'btn',type:'button',onclick:()=>{const all=getGarden();const it=all.find(x=>x.id===p.id);if(it){it.last=Date.now();saveGarden(all);}renderGarden();}},ic('drop'),'سقيتها الآن'),el('button',{class:'textbtn',type:'button','aria-label':'حذف',onclick:()=>{actRow.hidden=true;confirmRow.hidden=false;}},'حذف'));
+    return el('div',{class:'card gcard'},
+      el('div',{class:'gtop'},el('div',{class:'art',html:p.thumb?'':art(p.art)},p.thumb?el('img',{src:p.thumb,alt:''}):null),
+        el('div',{class:'txt'},el('b',{text:p.name}),p.sci?el('div',{class:'sci',style:'font-size:12.5px',text:p.sci}):null,p.note?el('div',{class:'muted small',text:'تحت المتابعة: '+p.note}):null),
+        el('span',{class:'pill '+info.cls},ic('drop'),info.text)),
+      el('div',{class:'interval'},el('span',{text:'أسقيها كل'}),el('button',{type:'button','aria-label':'أقل',onclick:()=>setI(-1)},'−'),out,el('button',{type:'button','aria-label':'أكثر',onclick:()=>setI(1)},'+'),el('span',{text:'يوم'})),
+      actRow,confirmRow);
+  }));
+}
+function renderSummary(){
+  const g=getGarden(), box=$('#gardenSummary');
+  if(!g.length){box.replaceChildren();return;}
+  const due=g.filter(p=>Math.ceil((p.last+p.interval*DAY-Date.now())/DAY)<=0);
+  box.replaceChildren(el('button',{class:'prow',type:'button',onclick:()=>show('garden')},el('div',{class:'art',style:'background:var(--accent-soft);color:var(--accent)'},ic('drop')),
+    el('div',{class:'txt'},el('b',{text:due.length?(toAr(due.length)+' '+(due.length===1?'نبتة تحتاج':'نباتات تحتاج')+' سقي اليوم'):'حديقتك مرتوية اليوم'}),el('span',{class:'muted small',text:due.length?due.map(p=>p.name).slice(0,3).join('، '):'آخر تحديث الآن'})),ic('chevL','chev')));
+}
+
+/* ---------- ask ---------- */
+const SUGG=['ليش أوراق نبتتي تصفر؟','كم مرة أسقي الصبار في الصيف؟','وش أفضل نبتة لغرفة ما فيها شباك؟','كيف أكثّر البوتس بالماء؟','نباتات آمنة على القطط؟'];
+let turns=[], askCtl=null;
+$('#suggest').replaceChildren(...SUGG.map(q=>el('button',{type:'button',onclick:()=>{$('#askInput').value=q;send();}},q)));
+function bubble(cls,text){const b=el('div',{class:'msg '+cls,text});$('#chat').append(b);return b;}
+async function send(){
+  const inp=$('#askInput'), q=inp.value.trim(); if(!q)return;
+  if(askCtl){askCtl.abort();}
+  inp.value=''; bubble('me',q); $('#suggest').hidden=true;
+  turns.push({role:'user',content:q}); if(turns.length>14)turns=turns.slice(-14); while(turns.length&&turns[0].role!=='user')turns.shift();
+  const b=bubble('bot thinking','يفكر…'); b.scrollIntoView({block:'end',behavior:'smooth'});
+  const ctl=new AbortController(); askCtl=ctl;
+  try{
+    const r=await api('ask',{turns},ctl.signal);
+    b.classList.remove('thinking'); b.textContent=r.text; turns.push({role:'assistant',content:r.text});
+  }catch(e){
+    b.classList.remove('thinking');
+    turns.pop();
+    if(e&&e.code==='cancelled'){b.remove();}
+    else{b.textContent=errCopy(e&&e.code);}
+  }finally{if(askCtl===ctl)askCtl=null;}
+}
+$('#askForm').addEventListener('submit',e=>{e.preventDefault();send();});
+$('#askInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+
+/* ---------- init ---------- */
+$('#tipText').textContent=TIPS[Math.floor(Date.now()/DAY)%TIPS.length];
+$('#popular').replaceChildren(...PLANTS.map(p=>el('button',{class:'pchip',type:'button',onclick:()=>openPlant(p)},el('div',{class:'art',html:art(p.art)}),el('b',{text:p.name_ar}),el('i',{text:p.sci}))));
+renderLib('');renderSummary();
+})();
+</script>
+
+</body>
+</html>

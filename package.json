@@ -1,0 +1,6 @@
+{
+  "name": "mashtal",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" }
+}
