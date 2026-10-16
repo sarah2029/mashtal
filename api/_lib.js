@@ -31,8 +31,12 @@ export function readImage(body) {
 /* ---------- Gemini (الخطة المجانية من Google AI Studio) ---------- */
 const GEM = 'https://generativelanguage.googleapis.com/v1beta';
 // نجرّب النماذج بالترتيب: إذا واحد انتهى حدّه المجاني أو غير متاح، ننتقل للي بعده (لكل نموذج حد مستقل)
-export const MODELS = [...new Set([process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'].filter(Boolean))];
+// النماذج المشمولة بالخطة المجانية (الأقوى أولاً). الأسماء اللي ترجع 404 تُتخطى تلقائياً.
+export const MODELS = [...new Set([process.env.GEMINI_MODEL, 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3-flash-preview',
+  'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-flash-lite-latest'].filter(Boolean))];
 export const lastError = { model: '', status: 0, message: '' };
+export const attempts = [];
+const dead = new Set(); // نماذج غير متاحة لهذا المفتاح، ما نعيد تجربتها
 
 async function callModel(key, m, body) {
   const r = await fetch(`${GEM}/models/${m}:generateContent`, {
@@ -41,6 +45,8 @@ async function callModel(key, m, body) {
   const t = await r.text().catch(() => '');
   let msg = t; try { msg = JSON.parse(t).error.message; } catch {}
   Object.assign(lastError, { model: m, status: r.status, message: String(msg).slice(0, 300) });
+  attempts.push({ model: m, status: r.status, message: String(msg).slice(0, 120) }); if (attempts.length > 20) attempts.shift();
+  if (r.status === 404) dead.add(m);
   console.error('Gemini error', m, r.status, msg);
   return { ok: false, status: r.status };
 }
@@ -59,6 +65,7 @@ export async function ai({ system, turns, image, json = false, maxTokens = 4096 
     generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2 } };
   let limited = false, badKey = false;
   for (const m of MODELS) {
+    if (dead.has(m)) continue;
     let res = await callModel(key, m, json ? { ...base, generationConfig: { ...base.generationConfig, responseMimeType: 'application/json' } } : base);
     if (!res.ok && res.status === 400 && json) res = await callModel(key, m, base); // بعض النماذج ما تقبل وضع JSON
     if (res.ok) {
